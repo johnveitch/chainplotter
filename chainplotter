@@ -169,13 +169,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.dc.param=param
         self.dc.update_figure()
 
-usage="""%prog
-Simple chain viewing tool
-"""
 
 if __name__=='__main__':
     from argparse import ArgumentParser
-    parser=ArgumentParser(usage)
+    parser=ArgumentParser(prog='chainplotter',description='A simple GUI for watching live MCMC chains')
     parser.add_argument('-i','--input',default=None,metavar='FILE',help='input file to plot')
     parser.add_argument('-p','--param',default=None,metavar='PARAMNAME',help='Parameter to plot')
     opts=parser.parse_args(sys.argv[1:])
