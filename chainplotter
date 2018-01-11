@@ -11,6 +11,7 @@
 from __future__ import unicode_literals
 import sys
 import os
+from pathlib import Path
 import random
 import matplotlib
 import numpy as np
@@ -47,14 +48,6 @@ class MyMplCanvas(FigureCanvas):
         pass
 
 
-class MyStaticMplCanvas(MyMplCanvas):
-    """Simple canvas with a sine plot."""
-
-    def compute_initial_figure(self):
-        t = arange(0.0, 3.0, 0.01)
-        s = sin(2*pi*t)
-        self.axes.plot(t, s)
-
 class ChainPlot(MyMplCanvas):
     """A canvas that updates itself every second with a new plot."""
 
@@ -66,9 +59,6 @@ class ChainPlot(MyMplCanvas):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.refresh_data)
         timer.start(10000)
-
-    #def compute_initial_figure(self):
-    #    self.axes.plot([0, 1, 2, 3], [1, 2, 0, 4], 'r')
 
     def refresh_data(self):
         self.posterior = np.genfromtxt(self.filename,skip_footer=1,names=True,deletechars="")
@@ -97,6 +87,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.file_menu = QtWidgets.QMenu('&File', self)
         self.file_menu.addAction('&Open', self.fileLoad,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_O)
+        self.file_menu.addAction('&Save Figure',self.figSave,
+                                 QtCore.Qt.CTRL + QtCore.Qt.Key_S)
         self.file_menu.addAction('&Quit', self.fileQuit,
                                  QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
@@ -131,10 +123,15 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         """
         Set the input file
         """
-        f, pattern = QtWidgets.QFileDialog(self,'Open File',self.infile,'ASCII Data files (*.dat *.txt)').getOpenFileName(self,"Set file to watch")
+        f, pattern = QtWidgets.QFileDialog(self,'Open File',self.infile).getOpenFileName(self,"Set file to watch")
         if f:
             self.set_infile(f)
-        
+    
+    def figSave(self):
+        f, pattern = QtWidgets.QFileDialog(self,'Save Figure',os.path.dirname(self.infile)).getSaveFileName(self,"Choose file to save")
+        if f:
+            self.dc.figure.savefig(f)
+        self.statusBar().showMessage(f'{f}: file written')
 
     def fileQuit(self):
         self.close()
@@ -150,7 +147,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                                 )
 
     def set_infile(self,filename):
-        
+        if not os.path.exists(filename):
+            self.statusBar().showMessage(f'File not found: {filename}')
         with open(filename) as f:
             self.names=f.readline().split()
             
