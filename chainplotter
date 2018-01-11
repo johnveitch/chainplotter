@@ -12,20 +12,17 @@ from __future__ import unicode_literals
 import sys
 import os
 from pathlib import Path
-import random
 import matplotlib
 import numpy as np
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
 from PyQt5 import QtCore, QtWidgets
 
-from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 progname = os.path.basename(sys.argv[0])
 progversion = "0.1"
-
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -46,7 +43,6 @@ class MyMplCanvas(FigureCanvas):
 
     def compute_initial_figure(self):
         pass
-
 
 class ChainPlot(MyMplCanvas):
     """A canvas that updates itself every second with a new plot."""
@@ -116,8 +112,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
-
-        #self.statusBar().showMessage("All hail matplotlib!", 2000)
         
     def fileLoad(self):
         """
@@ -149,12 +143,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def set_infile(self,filename):
         if not os.path.exists(filename):
             self.statusBar().showMessage(f'File not found: {filename}')
+            return
         with open(filename) as f:
             self.names=f.readline().split()
             
         self.pcombo.clear()
-        #for x in range(self.pcombo.count()):
-        #    self.pcombo.removeItem(0)
+
         for n in self.names:
             self.pcombo.addItem(n)
         self.infile=filename
