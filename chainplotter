@@ -50,14 +50,18 @@ class ChainPlot(MyMplCanvas):
     def __init__(self, *args, filename=None, param=None, **kwargs, ):
         MyMplCanvas.__init__(self, *args, **kwargs)
         self.filename=filename
+        self.mtime=0
         self.param=param
         self.posterior=None
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.refresh_data)
-        timer.start(10000)
+        timer.start(1000)
 
     def refresh_data(self):
-        self.posterior = np.genfromtxt(self.filename,skip_footer=1,names=True,deletechars="")
+        newtime = os.path.getmtime(self.filename)
+        if newtime > self.mtime:
+            self.mtime = newtime
+            self.posterior = np.genfromtxt(self.filename,skip_footer=1,names=True,deletechars="")
 
     def update_figure(self):
         if self.posterior is None: return
@@ -146,11 +150,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             return
         with open(filename) as f:
             self.names=f.readline().split()
-            
+        # Add combo box for parameter names
         self.pcombo.clear()
-
-        for n in self.names:
-            self.pcombo.addItem(n)
+        self.pcombo.addItems(self.names)
         self.infile=filename
         self.dc.filename=filename
         self.dc.refresh_data()
