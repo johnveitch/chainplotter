@@ -155,6 +155,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.pcombo.addItems(self.names)
         self.infile=filename
         self.dc.filename=filename
+        self.dc.mtime=0
         self.dc.refresh_data()
         #self.dc.update_figure()
         
