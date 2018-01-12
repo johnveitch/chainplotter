@@ -62,6 +62,7 @@ class ChainPlot(MyMplCanvas):
         if newtime > self.mtime:
             self.mtime = newtime
             self.posterior = np.genfromtxt(self.filename,skip_footer=1,names=True,deletechars="")
+            self.update_figure()
 
     def update_figure(self):
         if self.posterior is None: return
