@@ -58,6 +58,8 @@ class ChainPlot(MyMplCanvas):
         timer.start(1000)
 
     def refresh_data(self):
+        if not self.filename: return
+        if not os.path.exists(self.filename): return
         newtime = os.path.getmtime(self.filename)
         if newtime > self.mtime:
             self.mtime = newtime
@@ -73,6 +75,7 @@ class ChainPlot(MyMplCanvas):
         self.axes.set_xlabel('iteration')
         self.axes.set_ylabel(self.param)
         self.axes.set_title(self.filename)
+        self.figure.tight_layout()
         self.draw()
 
 
